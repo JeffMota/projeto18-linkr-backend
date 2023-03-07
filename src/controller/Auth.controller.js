@@ -1,5 +1,8 @@
 import { db } from "../config/database.connect.js"
+import dotenv from "dotenv"
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+dotenv.config()
 
 //Cadastro de usuário
 export async function signup(req, res) {
@@ -31,22 +34,9 @@ export async function signin(req, res) {
         const passwordIsCorrect = bcrypt.compareSync(password, user.rows[0].password)
         if (!passwordIsCorrect) return res.sendStatus(401)
 
-        const alreadyExist = await db.query(`SELECT * FROM sessions WHERE "userId" = ${user.rows[0].id};`)
+        const token = jwt.sign({ userId: user.rows[0].id }, process.env.SECRET_JWT, { expiresIn: 86400 })
 
-        if (alreadyExist.rows.length > 0) {
-
-            const token = uuid()
-
-            await db.query(`UPDATE sessions SET token=$1 WHERE "userId" = $2;`, [token, user.rows[0].id])
-
-            return res.status(200).send({ token: token })
-        }
-
-        const token = uuid()
-
-        await db.query(`INSERT INTO sessions ("userId", token) VALUES ($1, $2);`, [user.rows[0].id, token])
-
-        return res.status(200).send({ token: token })
+        return res.send({ token: token })
 
 
     } catch (error) {
