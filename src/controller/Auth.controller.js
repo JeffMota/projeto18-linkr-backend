@@ -3,16 +3,16 @@ import bcrypt from "bcrypt"
 
 //Cadastro de usuário
 export async function signup(req, res) {
-    const { name, email, password, picture_url } = req.body
+    const { username, email, password, picture_url } = req.body
     try {
 
-        const alreadyExist = await db.query(`SELECT * FROM users WHERE email = '${email}';`)
+        const alreadyExist = await db.query(`SELECT * FROM users WHERE email = $1;`, [email])
 
         if (alreadyExist.rows.length > 0) return res.sendStatus(409)
 
         const hashedPassword = bcrypt.hashSync(password, 10)
 
-        await db.query(`INSERT INTO users (name, email, password, picture_url) VALUES ($1, $2, $3, $4);`, [name, email, password, picture_url])
+        await db.query(`INSERT INTO users (username, email, password, picture_url) VALUES ($1, $2, $3, $4);`, [username, email, hashedPassword, picture_url])
 
         res.sendStatus(201)
     } catch (error) {
