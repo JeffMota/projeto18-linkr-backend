@@ -16,7 +16,9 @@ class PostsRepository {
     return await db.query(
       `SELECT users.username, users.picture_url, posts.url, posts.description
        FROM posts
-       LEFT JOIN users ON posts."userId" = users.id;`
+       LEFT JOIN users ON posts."userId" = users.id
+       ORDER BY createdAt DESC
+       LIMIT 20;`
     );
   }
 }
