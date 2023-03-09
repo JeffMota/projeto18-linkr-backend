@@ -13,6 +13,8 @@ export async function searchUser(req,res){
         if(result.rowCount===0){
             return res.sendStatus(404)
         }
+        console.log(result.rows)
+
         return res.send(result.rows)
 
 

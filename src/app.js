@@ -1,14 +1,15 @@
-import express from "express"
-import cors from "cors"
-import dotenv from "dotenv"
-import authRouter from "./routes/Auth.routes.js"
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import router from "./routes/index.js";
 import searchRouter from "./routes/search.routes.js"
-dotenv.config()
+dotenv.config();
 
-const server = express()
-server.use(cors())
-server.use(express.json())
-server.use(authRouter,searchRouter)
+const server = express();
+server.use(cors());
+server.use(express.json());
 
-const PORT = process.env.PORT || 5000
-server.listen(PORT, () => console.log(`Rodando na porta ${PORT}`))
+server.use(router);
+
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`Rodando na porta ${PORT}`));
