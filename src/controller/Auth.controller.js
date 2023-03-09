@@ -38,7 +38,7 @@ export async function signin(req, res) {
 
         const token = jwt.sign({ userId: user.rows[0].id }, process.env.SECRET_JWT, { expiresIn: 86400 })
 
-        return res.send({ token: token })
+        return res.send({ token: token, userImgUrl: user.rows[0].pictureUrl })
 
 
     } catch (error) {
