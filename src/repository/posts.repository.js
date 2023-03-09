@@ -14,10 +14,10 @@ class PostsRepository {
 
   async postsGetAll() {
     return await db.query(
-      `SELECT users.username, users.picture_url, posts.url, posts.description
+      `SELECT users.username, users."pictureUrl", posts.url, posts.description
        FROM posts
        LEFT JOIN users ON posts."userId" = users.id
-       ORDER BY "createdAt" DESC
+       ORDER BY posts."createdAt" DESC
        LIMIT 20;`
     );
   }
