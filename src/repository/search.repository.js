@@ -5,5 +5,3 @@ export async function search(username) {
         LIMIT 5`)
    
 }
-
-

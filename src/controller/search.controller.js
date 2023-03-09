@@ -6,6 +6,7 @@ dotenv.config()
 
 export async function searchUser(req,res){
     const {username} = req.body
+    console.log(username)
     try {
         const result = await search(username)
 
