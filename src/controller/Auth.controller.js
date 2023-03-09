@@ -26,25 +26,23 @@ export async function signup(req, res) {
 
 //Login
 export async function signin(req, res) {
-  const { email, password } = req.body;
 
-  try {
-    const user = await authRepository.emailCheck(email);
-    if (user.rows.length < 1) return res.sendStatus(401);
-    const passwordIsCorrect = bcrypt.compareSync(
-      password,
-      user.rows[0].password
-    );
-    if (!passwordIsCorrect) return res.sendStatus(401);
+    const { email, password } = req.body
 
-    const token = jwt.sign(
-      { userId: user.rows[0].id },
-      process.env.SECRET_JWT,
-      { expiresIn: 86400 }
-    );
+    try {
+        const user = await authRepository.emailCheck(email)
+        if (user.rows.length < 1) return res.sendStatus(401)
+        const passwordIsCorrect = bcrypt.compareSync(password, user.rows[0].password)
+        if (!passwordIsCorrect) return res.sendStatus(401)
 
-    return res.send({ token: token });
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
+        const token = jwt.sign({ userId: user.rows[0].id }, process.env.SECRET_JWT, { expiresIn: 86400 })
+
+        return res.send({ token: token, userImgUrl: user.rows[0].pictureUrl })
+
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+
 }
+
