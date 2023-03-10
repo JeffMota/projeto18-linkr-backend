@@ -7,12 +7,14 @@ export async function postsCreate(_, res) {
   const { userId, body } = res.locals;
   try {
     const metadata = await getMetadata(body.url);
+    console.log(metadata);
     await postsRepository.postsRegistry(
       userId,
       body.url,
       body.description,
       metadata
     );
+
     res.sendStatus(201);
   } catch (error) {
     res.status(500).send(error.message);
