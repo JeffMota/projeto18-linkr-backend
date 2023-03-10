@@ -24,30 +24,45 @@ class PostsRepository {
 
   async postsGetAll() {
     return await db.query(
-      `SELECT posts.id, users.username, users."pictureUrl", posts.url, posts.description, posts."urlTitle", posts."urlDescription", posts."urlImage" 
-       FROM posts
-       LEFT JOIN users ON posts."userId" = users.id
-       ORDER BY posts."createdAt" DESC
-       LIMIT 20;`
+      `SELECT posts.id, users.username, users."pictureUrl", 
+              posts.url, posts.description, posts."urlTitle", 
+              posts."urlDescription", posts."urlImage", COUNT(likes."postId") AS likes,
+              (SELECT CASE 
+                WHEN (SELECT COUNT(*) FROM likes WHERE "postId" = posts.id) = 0 
+                THEN '[]'::json 
+                ELSE json_agg(DISTINCT users.username) 
+              END
+              FROM likes
+              LEFT JOIN users ON likes."userId" = users.id
+              WHERE likes."postId" = posts.id
+              ) AS "likesUsernames",
+              (SELECT CASE 
+                WHEN (SELECT COUNT(*) FROM likes WHERE "postId" = posts.id) = 0 
+                THEN '[]'::json 
+                ELSE json_agg(DISTINCT likes."userId") 
+              END
+              FROM likes
+              WHERE likes."postId" = posts.id
+              ) AS "likesUserId"   
+      FROM posts
+      LEFT JOIN users ON posts."userId" = users.id
+      LEFT JOIN likes ON posts.id = likes."postId"
+      GROUP BY posts.id, posts.id, users.username, users."pictureUrl", posts.url, posts.description, posts."urlTitle", posts."urlDescription", posts."urlImage"
+      ORDER BY posts."createdAt" DESC
+      LIMIT 20;`
     );
   }
 
   async getPostById(id) {
-    const result = await db.query(
-      `SELECT * FROM posts WHERE id = $1;`,
-      [id]
-    );
-    if(result.length === 0) {
+    const result = await db.query(`SELECT * FROM posts WHERE id = $1;`, [id]);
+    if (result.length === 0) {
       return null;
     }
     return result.rows[0];
   }
 
   async deletePost(id) {
-    const result = await db.query(
-      `DELETE FROM posts WHERE id = $1;`,
-      [id]
-    );
+    const result = await db.query(`DELETE FROM posts WHERE id = $1;`, [id]);
     return result.affectedRows;
   }
 
