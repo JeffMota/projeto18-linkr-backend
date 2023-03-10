@@ -90,3 +90,17 @@ export async function postsUpdate(req, res) {
     res.status(500).send(error.message);
   }
 }
+
+export async function getPostsUser(req,res){
+  const  {id}  = req.params;
+  console.log(id)
+
+  try {
+    const posts = await postsRepository.postGetUsername(id);
+    res.send(posts.rows)
+  } catch (error) {
+    console.log(error)
+  }
+  
+
+}

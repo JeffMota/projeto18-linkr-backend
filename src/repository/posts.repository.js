@@ -24,7 +24,7 @@ class PostsRepository {
 
   async postsGetAll() {
     return await db.query(
-      `SELECT posts.id, users.username, users."pictureUrl", 
+      `SELECT posts.id,posts."userId", users.username, users."pictureUrl", 
               posts.url, posts.description, posts."urlTitle", 
               posts."urlDescription", posts."urlImage", COUNT(likes."postId") AS likes,
               (SELECT CASE 
@@ -73,6 +73,26 @@ class PostsRepository {
     );
     return result.affectedRows;
   }
+
+  async postsUser (id){
+    console.log(id,"id")
+    return await db.query(`
+    SELECT * FROM posts WHERE "userId" = $1`,[id]);
+  }
+  async postsGetByUser(id) {
+    return await db.query(
+      `SELECT * FROM posts WHERE "userId" = $1`,[id]
+    );
+  }
+  async postGetUsername(id){
+    return await db.query(
+    `SELECT users.username ,posts.url, posts.description FROM posts 
+    LEFT JOIN users 
+    ON posts."userId" = users.id
+    WHERE users.id = $1`,[id])
+  }
+
 }
+
 
 export default PostsRepository;
