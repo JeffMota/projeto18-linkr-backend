@@ -39,7 +39,7 @@ export async function signin(req, res) {
 
     const token = jwt.sign(
       { userId: user.rows[0].id },
-      process.env.SECRET_JWT,
+      process.env.SECRET_KEY,
       { expiresIn: 86400 }
     );
 
