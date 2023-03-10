@@ -24,7 +24,7 @@ class PostsRepository {
 
   async postsGetAll() {
     return await db.query(
-      `SELECT users.username, users."pictureUrl", posts.url, posts.description, posts."urlTitle", posts."urlDescription", posts."urlImage" 
+      `SELECT posts.id, users.username, users."pictureUrl", posts.url, posts.description, posts."urlTitle", posts."urlDescription", posts."urlImage" 
        FROM posts
        LEFT JOIN users ON posts."userId" = users.id
        ORDER BY posts."createdAt" DESC
