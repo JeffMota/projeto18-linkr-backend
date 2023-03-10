@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node ./src/app.js",
+    "start": "nodemon ./src/app.js",
     "dev": "nodemon ./src/app.js"
   },
   "keywords": [],
@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.0",
     "nodemon": "^2.0.20",
     "pg": "^8.9.0",
-    "url-metadata": "^2.5.0"
+    "url-metadata": "^2.5.0",
+    "react-router-dom": "^6.8.2"
   }
 }
