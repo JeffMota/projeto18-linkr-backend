@@ -1,3 +1,4 @@
+
 --
 -- PostgreSQL database dump
 --
@@ -404,7 +405,7 @@ CREATE TABLE public.tags (
 --
 
 CREATE TABLE public.users (
-    id integer NOT NULL,
+    id serial primary key NOT NULL,
     username text NOT NULL,
     email text NOT NULL,
     password character varying(255) NOT NULL,
