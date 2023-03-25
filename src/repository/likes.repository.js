@@ -1,6 +1,10 @@
 import { db } from "../config/database.connect.js";
 
 class LikesRepository {
+  async likesNotify() {
+    return await db.query(`NOTIFY likes;`);
+  }
+
   async likesRegistry(userId, postId) {
     return await db.query(
       `INSERT INTO likes (

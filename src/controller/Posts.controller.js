@@ -14,7 +14,7 @@ export async function postsCreate(_, res) {
       body.description,
       metadata
     );
-
+    await postsRepository.postsNotify();
     res.sendStatus(201);
   } catch (error) {
     res.status(500).send(error.message);
@@ -46,7 +46,6 @@ export async function postsRead(_, res) {
   }
 }
 
-
 export async function postsDelete(req, res) {
   const { id } = req.params;
   const { userId } = res.locals;
@@ -57,14 +56,16 @@ export async function postsDelete(req, res) {
   }
 
   if (post.userId !== userId) {
-    return res.status(404).send("Você não tem permissão para deletar esse post");
+    return res
+      .status(404)
+      .send("Você não tem permissão para deletar esse post");
   }
 
   try {
     await postsRepository.deletePost(id);
+    await postsRepository.postsNotify();
     res.status(200).send("Post deletado com sucesso");
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).send(error.message);
   }
 }
@@ -84,23 +85,21 @@ export async function postsUpdate(req, res) {
 
   try {
     await postsRepository.updatePost(req.body.url, req.body.description, id);
+    await postsRepository.postsNotify();
     res.status(200).send("Post atualizado com sucesso");
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).send(error.message);
   }
 }
 
-export async function getPostsUser(req,res){
-  const  {id}  = req.params;
-  console.log(id)
+export async function getPostsUser(req, res) {
+  const { id } = req.params;
+  console.log(id);
 
   try {
     const posts = await postsRepository.postGetUsername(id);
-    res.send(posts.rows)
+    res.send(posts.rows);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-  
-
 }

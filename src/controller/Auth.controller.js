@@ -16,8 +16,12 @@ export async function signup(req, res) {
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    authRepository.userRegistry(username, email, hashedPassword, pictureUrl);
-
+    await authRepository.userRegistry(
+      username,
+      email,
+      hashedPassword,
+      pictureUrl
+    );
     res.sendStatus(201);
   } catch (error) {
     res.status(500).send(error.message);

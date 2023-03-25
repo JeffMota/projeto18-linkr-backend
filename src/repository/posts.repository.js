@@ -1,6 +1,10 @@
 import { db } from "../config/database.connect.js";
 
 class PostsRepository {
+  async postsNotify() {
+    return await db.query(`NOTIFY posts;`);
+  }
+
   async postsRegistry(userId, url, description, metadata) {
     return await db.query(
       `INSERT INTO posts (
@@ -74,25 +78,26 @@ class PostsRepository {
     return result.affectedRows;
   }
 
-  async postsUser (id){
-    console.log(id,"id")
-    return await db.query(`
-    SELECT * FROM posts WHERE "userId" = $1`,[id]);
-  }
-  async postsGetByUser(id) {
+  async postsUser(id) {
+    console.log(id, "id");
     return await db.query(
-      `SELECT * FROM posts WHERE "userId" = $1`,[id]
+      `
+    SELECT * FROM posts WHERE "userId" = $1`,
+      [id]
     );
   }
-  async postGetUsername(id){
+  async postsGetByUser(id) {
+    return await db.query(`SELECT * FROM posts WHERE "userId" = $1`, [id]);
+  }
+  async postGetUsername(id) {
     return await db.query(
-    `SELECT users.username ,posts.url, posts.description FROM posts 
+      `SELECT users.username ,posts.url, posts.description FROM posts 
     LEFT JOIN users 
     ON posts."userId" = users.id
-    WHERE users.id = $1`,[id])
+    WHERE users.id = $1`,
+      [id]
+    );
   }
-
 }
-
 
 export default PostsRepository;

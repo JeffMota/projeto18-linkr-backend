@@ -11,8 +11,10 @@ export async function likesCreate(_, res) {
     );
     if (response.rows.length === 0) {
       await likesRepository.likesRegistry(userId, body.postId);
+      await likesRepository.likesNotify();
     } else {
       await likesRepository.dislikesRegistry(userId, body.postId);
+      await likesRepository.likesNotify();
     }
     res.sendStatus(200);
   } catch (error) {
