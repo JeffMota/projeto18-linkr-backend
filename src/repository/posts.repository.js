@@ -26,7 +26,7 @@ class PostsRepository {
     );
   }
 
-  async postsGetAll() {
+  async postsGetAll(userId) {
     return await db.query(
       `SELECT posts.id,posts."userId", users.username, users."pictureUrl", 
               posts.url, posts.description, posts."urlTitle", 
@@ -51,9 +51,11 @@ class PostsRepository {
       FROM posts
       LEFT JOIN users ON posts."userId" = users.id
       LEFT JOIN likes ON posts.id = likes."postId"
+      LEFT JOIN follows f ON f."followerId" = $1
+      WHERE  f."followingId" = posts."userId"
       GROUP BY posts.id, posts.id, users.username, users."pictureUrl", posts.url, posts.description, posts."urlTitle", posts."urlDescription", posts."urlImage"
       ORDER BY posts."createdAt" DESC
-      LIMIT 20;`
+      LIMIT 20;`,[userId]
     );
   }
 

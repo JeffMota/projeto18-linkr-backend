@@ -39,7 +39,8 @@ async function getMetadata(url) {
 //Pegar os Posts
 export async function postsRead(_, res) {
   try {
-    const response = await postsRepository.postsGetAll();
+    const { userId } = res.locals;
+    const response = await postsRepository.postsGetAll(userId);
     res.status(200).send(response.rows);
   } catch (error) {
     res.status(500).send(error.message);
