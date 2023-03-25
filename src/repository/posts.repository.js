@@ -89,7 +89,7 @@ class PostsRepository {
     );
   }
   async postsGetByUser(id) {
-    return await db.query(`SELECT * FROM posts WHERE "userId" = $1`, [id]);
+    return await db.query(`SELECT username FROM users WHERE id = $1`, [id]);
   }
   async postGetUsername(id) {
     return await db.query(
