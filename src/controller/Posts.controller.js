@@ -39,7 +39,8 @@ async function getMetadata(url) {
 //Pegar os Posts
 export async function postsRead(_, res) {
   try {
-    const response = await postsRepository.postsGetAll();
+    const { userId } = res.locals;
+    const response = await postsRepository.postsGetAll(userId);
     res.status(200).send(response.rows);
   } catch (error) {
     res.status(500).send(error.message);
@@ -98,6 +99,18 @@ export async function getPostsUser(req, res) {
 
   try {
     const posts = await postsRepository.postGetUsername(id);
+    res.send(posts.rows);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getUserName(req, res) {
+  const { id } = req.params;
+  console.log(id);
+
+  try {
+    const posts = await postsRepository.postsGetByUser(id);
     res.send(posts.rows);
   } catch (error) {
     console.log(error);
