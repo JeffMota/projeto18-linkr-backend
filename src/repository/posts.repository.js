@@ -26,34 +26,88 @@ class PostsRepository {
     );
   }
 
-  async postsGetAll() {
+  async postsGetAll(userId) {
     return await db.query(
-      `SELECT posts.id,posts."userId", users.username, users."pictureUrl", 
-              posts.url, posts.description, posts."urlTitle", 
-              posts."urlDescription", posts."urlImage", COUNT(likes."postId") AS likes,
-              (SELECT CASE 
+      `SELECT 
+        posts.id, 
+        posts."userId", 
+        users.username, 
+        users."pictureUrl", 
+        posts.url, 
+        posts.description, 
+        posts."urlTitle", 
+        posts."urlDescription", 
+        posts."urlImage", 
+        (SELECT 
+            CASE 
                 WHEN (SELECT COUNT(*) FROM likes WHERE "postId" = posts.id) = 0 
                 THEN '[]'::json 
-                ELSE json_agg(DISTINCT users.username) 
-              END
-              FROM likes
-              LEFT JOIN users ON likes."userId" = users.id
-              WHERE likes."postId" = posts.id
-              ) AS "likesUsernames",
-              (SELECT CASE 
+                ELSE json_agg(
+                  CASE 
+                      WHEN likes."userId" = $1 THEN 'Você' 
+                      ELSE users.username
+                  END
+                ) 
+            END
+        FROM likes
+        LEFT JOIN users ON likes."userId" = users.id
+        WHERE likes."postId" = posts.id
+        ) AS "likesUsernames",
+        (SELECT 
+            CASE 
                 WHEN (SELECT COUNT(*) FROM likes WHERE "postId" = posts.id) = 0 
                 THEN '[]'::json 
                 ELSE json_agg(DISTINCT likes."userId") 
-              END
-              FROM likes
-              WHERE likes."postId" = posts.id
-              ) AS "likesUserId"   
-      FROM posts
-      LEFT JOIN users ON posts."userId" = users.id
-      LEFT JOIN likes ON posts.id = likes."postId"
-      GROUP BY posts.id, posts.id, users.username, users."pictureUrl", posts.url, posts.description, posts."urlTitle", posts."urlDescription", posts."urlImage"
-      ORDER BY posts."createdAt" DESC
-      LIMIT 20;`
+            END
+        FROM likes
+        WHERE likes."postId" = posts.id
+        ) AS "likesUserId",
+        (
+          SELECT 
+            json_agg(json_build_object(
+              'id', id,
+              'username', username,
+              'pictureUrl', "pictureUrl",
+              'comment', comment, 
+              'followStatus', followStatus
+            ))
+          FROM (
+            SELECT 
+              comments.id,
+              users.username, 
+              users."pictureUrl",
+              comments.text AS comment, 
+              (
+                SELECT CASE 
+                  WHEN users.id = posts."userId" THEN ' • post’s author' 
+                  WHEN EXISTS (SELECT 1 FROM follows WHERE "followerId" = $1 AND "followingId" = users.id) THEN ' • following'
+                  ELSE '' 
+                END
+                FROM users 
+                LEFT JOIN follows ON users.id = follows."followingId" AND follows."followerId" = $1
+                WHERE users.id = comments."userId"
+              ) AS followStatus
+            FROM comments
+            LEFT JOIN users ON comments."userId" = users.id
+            WHERE comments."postId" = posts.id
+            ORDER BY comments."createdAt" ASC
+          ) AS "comments"
+        ) AS "comments"
+    FROM 
+        posts
+        LEFT JOIN users ON posts."userId" = users.id
+    GROUP BY 
+        posts.id, 
+        users.username, 
+        users."pictureUrl", 
+        posts.url, 
+        posts.description, 
+        posts."urlTitle", 
+        posts."urlDescription", 
+        posts."urlImage"
+    ORDER BY posts."createdAt" DESC
+    LIMIT 20;`,
+      [userId]
     );
   }
 
