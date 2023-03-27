@@ -104,3 +104,15 @@ export async function getPostsUser(req, res) {
     console.log(error);
   }
 }
+
+export async function getUserName(req, res) {
+  const { id } = req.params;
+  console.log(id);
+
+  try {
+    const posts = await postsRepository.postsGetByUser(id);
+    res.send(posts.rows);
+  } catch (error) {
+    console.log(error);
+  }
+}
